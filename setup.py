@@ -16,7 +16,7 @@ setup(
   name = 'prime_printer',         # How you named your package folder (MyLib)
   packages = ['prime_printer'],   # Chose the same as "name"
   include_package_data=True,
-  version = '0.0.3',      # Start with a small number and increase it with every change you make
+  version = '0.0.4',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'Console I/O Helper - Print Awesome. Make It Prime.',   # Give a short description about your library
   long_description = readme,

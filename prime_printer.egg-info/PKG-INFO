@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: prime_printer
-Version: 0.0.3
+Version: 0.0.4
 Summary: Console I/O Helper - Print Awesome. Make It Prime.
 Home-page: https://github.com/xXAI-botXx/prime_printer
 Download-URL: https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_01.zip
@@ -39,7 +39,7 @@ Console I/O Helper - Print Awesome. Make It Prime 🚀
 
 Easy Usage, Easy handling, BIG Improvement for your needs 🎯
 
-Easy Installation:
+Easy Installation -> https://pypi.org/project/prime-printer/
 ```bash 
 pip install prime_printer
 ```
