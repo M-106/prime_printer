@@ -1,8 +1,9 @@
 Metadata-Version: 2.4
 Name: prime_printer
-Version: 0.0.1
+Version: 0.0.3
 Summary: Console I/O Helper - Print Awesome. Make It Prime.
 Home-page: https://github.com/xXAI-botXx/prime_printer
+Download-URL: https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_01.zip
 Author: Tobia Ippolito
 License: MIT
 Keywords: Printing,Helper
@@ -15,8 +16,6 @@ Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Classifier: Programming Language :: Python :: 3.11
 Classifier: Programming Language :: Python :: 3.12
-Classifier: Operating System :: Windows
-Classifier: Operating System :: POSIX
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: climage
@@ -25,6 +24,7 @@ Dynamic: author
 Dynamic: classifier
 Dynamic: description
 Dynamic: description-content-type
+Dynamic: download-url
 Dynamic: home-page
 Dynamic: keywords
 Dynamic: license
@@ -35,7 +35,7 @@ Dynamic: summary
 # 😎 Prime Printer 👀
 Console I/O Helper - Print Awesome. Make It Prime 🚀
 
-![Logo](logo.png)
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/logo.png"></img>
 
 Easy Usage, Easy handling, BIG Improvement for your needs 🎯
 
@@ -51,25 +51,25 @@ pip install prime_printer
 🖨️ Printing with Delay, Type-Sound, Control, Conditions and Stylings:
 
 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;"> 
-<img src="./res/example_colored_delay_sound_print.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
-<img src="./res/example_game_menu.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
-<img src="./res/example_input_with_condition.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> </div>
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/res/example_colored_delay_sound_print.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/res/example_game_menu.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/res/example_input_with_condition.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> </div>
 
 <br><br>
 
 🖼️ Print Images:
 
 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;"> 
-<img src="./res/example_image_print.gif" width="400" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> </div>
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/res/example_image_print.gif" width="400" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> </div>
 
 <br><br>
 
 ⏳ Print your Process:
 
 <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;"> 
-<img src="./res/example_progress_bar_1.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
-<img src="./res/example_progress_bar_2.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
-<img src="./res/example_progress_bar_3.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> </div>
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/res/example_progress_bar_1.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/res/example_progress_bar_2.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> 
+<img src="https://raw.githubusercontent.com/xXAI-botXx/prime_printer/v_01/res/example_progress_bar_3.gif" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/> </div>
 
 <br><br>
 

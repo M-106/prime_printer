@@ -1,11 +1,11 @@
 # 😎 Prime Printer 👀
 Console I/O Helper - Print Awesome. Make It Prime 🚀
 
-![Logo](logo.png)
+<img src="logo.png"></img>
 
 Easy Usage, Easy handling, BIG Improvement for your needs 🎯
 
-Easy Installation:
+Easy Installation -> https://pypi.org/project/prime-printer/
 ```bash 
 pip install prime_printer
 ```
