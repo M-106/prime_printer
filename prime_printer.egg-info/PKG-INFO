@@ -1,9 +1,9 @@
-Metadata-Version: 2.4
+Metadata-Version: 2.1
 Name: prime_printer
-Version: 0.0.4
+Version: 0.0.5
 Summary: Console I/O Helper - Print Awesome. Make It Prime.
 Home-page: https://github.com/xXAI-botXx/prime_printer
-Download-URL: https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_01.zip
+Download-URL: https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_02.zip
 Author: Tobia Ippolito
 License: MIT
 Keywords: Printing,Helper
@@ -20,17 +20,6 @@ Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: climage
 Requires-Dist: pygame
-Dynamic: author
-Dynamic: classifier
-Dynamic: description
-Dynamic: description-content-type
-Dynamic: download-url
-Dynamic: home-page
-Dynamic: keywords
-Dynamic: license
-Dynamic: license-file
-Dynamic: requires-dist
-Dynamic: summary
 
 # 😎 Prime Printer 👀
 Console I/O Helper - Print Awesome. Make It Prime 🚀

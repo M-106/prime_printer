@@ -16,14 +16,14 @@ setup(
   name = 'prime_printer',         # How you named your package folder (MyLib)
   packages = ['prime_printer'],   # Chose the same as "name"
   include_package_data=True,
-  version = '0.0.4',      # Start with a small number and increase it with every change you make
+  version = '0.0.5',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'Console I/O Helper - Print Awesome. Make It Prime.',   # Give a short description about your library
   long_description = readme,
   long_description_content_type='text/markdown',
   author = 'Tobia Ippolito',                   # Type in your name
   url = 'https://github.com/xXAI-botXx/prime_printer',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_01.zip',    
+  download_url = 'https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_02.zip',    
   keywords = ['Printing', 'Helper'],   # Keywords that define your package best
   install_requires=[            # used libraries
           'climage',
