@@ -53,6 +53,8 @@ pip install prime_printer
     - [get_char](#get_char)
     - [rgb_to_python](#rgb_to_python)
     - [play_sound](#play_sound)
+- [Functions not for print](#functions-not-for-print)
+   - [show_images](#show_images)
 
 
 > There are also some examples on the bottom of the [core file](./prime_printer/cio_helper.py).
@@ -456,11 +458,64 @@ prime.play_sound(path)
 
 In this example, the function will load and play the `typing_sound.wav` file located in the `sounds` directory.
 
-Parameters
+---\> Parameters <---
 
 | **Parameter**          | **Type**    | **Description**                            |
 |------------------------|-------------|--------------------------------------------|
 | `path_to_sound_file`   | `str`       | The file path to the sound file to be played. It should be a valid path to a `.wav` file. |
+
+
+
+
+
+<br><br>
+
+---
+### Functions not for print
+
+
+---
+#### show_images
+
+`show_images(image_paths, title=None, image_width=5, axis=False, color_space="gray", cmap=None, cols=2, save_to=None, hspace=0.01, wspace=0.01, use_original_sytle=False, invert=False)`
+
+This function visualizes one or multiple images in a flexible grid layout using `matplotlib`. It supports different color spaces, image inversion, custom figure styling, and optional saving of the visualized image.
+
+```python
+from image_utils import show_images
+
+paths = ["images/cat.png", "images/dog.png"]
+show_images(paths, title="Animals", color_space="RGB", cols=2)
+```
+
+In this example, two images will be loaded, converted to RGB color space, and displayed in a 2-column layout with the title "Animals".
+
+
+
+---\> Parameters <---
+
+| **Parameter**            | **Type**        | **Description**                                                                 |
+|--------------------------|-----------------|---------------------------------------------------------------------------------|
+| `image_paths`            | `List[str]`     | List of paths to the images to be visualized.                                  |
+| `title`                  | `str`, optional | Title of the entire image plot. Default is `None`.                             |
+| `image_width`            | `int`, optional | Width of each image in inches. Default is `5`.                                 |
+| `axis`                   | `bool`, optional| Whether to display axis ticks and labels. Default is `False`.                  |
+| `color_space`            | `str`, optional | Colorspace for displaying images: `"RGB"`, `"BGR"`, `"gray"`, or `"HSV"`. Default is `"gray"`. |
+| `cmap`                   | `str`, optional | Matplotlib colormap to use (mostly for grayscale images). Default is `None`.   |
+| `cols`                   | `int`, optional | Number of columns in the plot grid. Default is `2`.                            |
+| `save_to`                | `str`, optional | File path to save the final visualization as an image. Default is `None`.      |
+| `hspace`                 | `float`, optional| Horizontal spacing between images. Default is `0.01`.                          |
+| `wspace`                 | `float`, optional| Vertical spacing between images. Default is `0.01`.                            |
+| `use_original_sytle`     | `bool`, optional| Whether to use the current matplotlib style. Default is `False`.               |
+| `invert`                 | `bool`, optional| Whether to invert the images before displaying. Default is `False`.            |
+
+
+
+---\> Returns <---
+
+| **Return** | **Type**        | **Description**                      |
+|------------|------------------|--------------------------------------|
+| `images`   | `np.ndarray`     | Array of the loaded images.          |
 
 
 

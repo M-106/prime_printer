@@ -1,2 +1,5 @@
 climage
 pygame
+opencv
+numpy
+matplotlib
