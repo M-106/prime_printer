@@ -535,12 +535,11 @@ def imshow(img, title=None, image_width=10, axis=False,
         img = np.reshape(img, shape=(1, img.shape[0], img.shape[1], 1))
     elif len(img_shape) == 3:
         # check if multiple gray images or multiple images with channel
-        if img.shape[2] < img.shape[0] and img.shape[1] == img.shape[2]:
-            img = np.reshape(img, shape=(1, img.shape[0], img.shape[1], img.shape[3]))
-        else:
-            # there could be cases where this is wrong
-            img = np.reshape(img, shape=(img.shape[0], img.shape[1], img.shape[3], 1))
-        img = np.reshape(img, shape=(1, img.shape[0], img.shape[1], 1))
+        # if img.shape[2] < img.shape[0] and img.shape[1] == img.shape[2]:
+        img = np.reshape(img, shape=(1, img.shape[0], img.shape[1], img.shape[2]))
+        # else:
+        #     # there could be cases where this is wrong
+        #     img = np.reshape(img, shape=(img.shape[0], img.shape[1], img.shape[2], 1))
     elif len(img_shape) != 4:
         raise ValueError(f"Image(s) have wrong shape! Founded shape: {img.shape}.")
 
@@ -572,7 +571,10 @@ def imshow(img, title=None, image_width=10, axis=False,
     # plotting
     print(f"Making you a beautiful plot...")
     fig, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(width, height))
-    ax = ax.ravel()
+    try:
+        ax = ax.ravel()
+    except AttributeError:
+        ax = [ax]
     fig.subplots_adjust(hspace=hspace, wspace=wspace)
     if type(title) == str:
         fig.suptitle(title, fontsize=128, y=0.95)
