@@ -4,30 +4,53 @@
 import sys
 import os
 import platform
+import subprocess
+import importlib.util
 import threading
 import time
 import random
 import re
 
+# time
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo, available_timezones
+
+# hardware info
+import psutil
+import GPUtil
+from cpuinfo import get_cpu_info
+
+# image console print
 import climage
 
-# Redirect standard output to suppress pygame's print message
+# audio
+#     redirect standard output to suppress pygames print message
+AUDIO_INITIALIZED = False
 sys.stdout = open(os.devnull, 'w')
-import pygame
-# Initialize pygame mixer
-pygame.mixer.init()
+try:
+    import pygame
+    # Initialize pygame mixer
+    pygame.mixer.init()
+    AUDIO_INITIALIZED = True
+except Exception:
+    AUDIO_INITIALIZED = False
 # Restore standard output
 sys.stdout = sys.__stdout__
 
+# console input
 if platform.system() == "Linux":
     import tty
     import termios
 else:
     import msvcrt
 
+# image plotting
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+
+# math
+from sympy import sympify, lambdify, symbols, integrate, diff
 
 
 
@@ -168,21 +191,28 @@ def play_sound(path_to_sound_file):
     """
     Plays a sound on windows or linux asychnronisly.
     """
-    # Initialize pygame mixer
-    pygame.mixer.init()
-    
-    # Load the sound file
-    sound = pygame.mixer.Sound(path_to_sound_file)
-    
-    # Play the sound asynchronously
-    sound.play()
+    try:
+        global AUDIO_INITIALIZED
+
+        if AUDIO_INITIALIZED:
+            # Initialize pygame mixer
+            pygame.mixer.init()
+            
+            # Load the sound file
+            sound = pygame.mixer.Sound(path_to_sound_file)
+            
+            # Play the sound asynchronously
+            sound.play()
+    except Exception:
+        # Audio not initialiazed or something else
+        pass
 
 def clear():
     """
     Clears the console.
     """
     txt = f"{CLEAR_SCREEN(2)}{SET_POSITION(0,0)}"
-    print(txt)
+    awesome_print(txt)
 
 def awesome_print(txt:str, *features:tuple, should_cut_str_in_chars=True, 
                   should_play_sound:bool=False, should_add_backspace_at_end:bool=True,
@@ -323,12 +353,12 @@ def print_image(img_path, width=60, is_256color=False, is_truecolor=True, is_uni
     - is_unicode : bool, optional (default=True)
         Whether to use Unicode characters for higher fidelity.
     """
-    print(img_to_str(img_path, width=width, is_256color=is_256color, is_truecolor=is_truecolor, is_unicode=is_unicode))
+    awesome_print(img_to_str(img_path, width=width, is_256color=is_256color, is_truecolor=is_truecolor, is_unicode=is_unicode))
 
-def print_progress_bar(total, progress, should_clear=False, 
+def get_progress_bar(total, progress, should_clear=False, 
                        left_bar_char="|", right_bar_char="|", progress_char="#", empty_char=" ",
                        front_message="", back_message="",
-                       size=100, should_print=True) -> str:
+                       size=100) -> str:
     """
     Prints one step of a progress as a progress bar.
 
@@ -371,16 +401,114 @@ def print_progress_bar(total, progress, should_clear=False,
     percentage_adjusted = int( size * percentage )
     bar = progress_char*percentage_adjusted + empty_char*(size-percentage_adjusted)
     progress_str = f"{front_message} {left_bar_char}{bar}{right_bar_char} {percentage*100:0.2f}% {back_message}".strip()
-    
-    # writing
-    if should_print:
-        sys.stdout.write(progress_str+"\n")
-        sys.stdout.flush()
-
-    # add optional delay?
-    # awesome_print(progress_str, should_play_sound=False, print_delay=None, print_delay_min=None)
 
     return progress_str
+
+def get_hardware() -> str:
+    """
+    Gets the current detected hardware and ai support.
+    """
+    harware_info = ""
+    harware_info += f"\n{'-'*32} \nYour Hardware:\n"
+
+    # General
+    harware_info += f"\n    ---> General <---"
+    harware_info += f"\nOperatingsystem: {platform.system()}"
+    harware_info += f"\nVersion: {platform.version()}"
+    harware_info += f"\nArchitecture: {platform.architecture()}"
+    harware_info += f"\nProcessor: {platform.processor()}"
+
+    # GPU-Information
+    harware_info += f"\n\n    ---> GPU <---"
+    gpus = GPUtil.getGPUs()
+    for gpu in gpus:
+        harware_info += f"\nGPU Name: {gpu.name}"
+        harware_info += f"\nVRAM Total: {int(gpu.memoryTotal)} MB"
+        harware_info += f"\nVRAM Used: {int(gpu.memoryUsed)} MB"
+        harware_info += f"\nUtilization: {round(gpu.load * 100, 1)} %"
+    try:
+        import torch
+        gpus = [torch.cuda.get_device_name(device_nr) for device_nr in range(torch.cuda.device_count())]
+        torch_support = False
+        if torch.cuda.is_available():
+            torch_support = True 
+            gpu_str = f"({','.join(gpus)})"
+        gpu_addition = f" {gpu_str}" if torch_support else ""
+        harware_info += f"\nPyTorch Support: {torch_support}{gpu_addition}"
+    except Exception:
+        harware_info += f"\nPyTorch Support: False -> not installed"
+    
+    try:
+        import tensorflow as tf
+        gpus = tf.config.list_physical_devices('GPU')
+        tf_support = False
+        if len(gpus) > 0:
+            tf_support = True 
+            gpu_str = f"({','.join(gpus)})"
+        gpu_addition = f" {gpu_str}" if tf_support else ""
+        harware_info += f"\nTensorFlow Support: {tf_support}{gpu_addition}" 
+    except Exception:
+        harware_info += f"\nTensorFlow Support: False -> not installed"
+
+    # CPU-Information
+    harware_info += f"\n\n    ---> CPU <---"
+    cpu_info = get_cpu_info()
+    harware_info += f"\nCPU-Name: {cpu_info["brand_raw"]}"
+    harware_info += f"\nCPU Kernels: {psutil.cpu_count(logical=False)}"
+    harware_info += f"\nLogical CPU-Kernels: {psutil.cpu_count(logical=True)}"
+    harware_info += f"\nCPU-Frequence: {int(psutil.cpu_freq().max)} MHz"
+    harware_info += f"\nCPU-Utilization: {round(psutil.cpu_percent(interval=1), 1)} %"
+    
+    # RAM-Information
+    harware_info += f"\n\n    ---> RAM <---"
+    ram = psutil.virtual_memory()
+    harware_info += f"\nRAM Total: {ram.total // (1024**3)} GB"
+    harware_info += f"\nRAM Available: {ram.available // (1024**3)} GB"
+    harware_info += f"\nRAM-Utilization: {round(ram.percent, 1)} %"
+
+    harware_info += f"\n\n{'-'*32}"
+
+    return harware_info
+
+# add argument in every file, for use_in_file -> then change internal to unicode
+def get_time(pattern="[DAY.MONTH.YEAR, HOUR:MINUTE]",
+               offset_days=0,
+               offset_hours=0,
+               offset_minutes=0,
+               offset_seconds=0,
+               time_zone="Europe/Berlin") -> str:
+    """
+    Prints the current time with a given offset and with a given pattern.
+
+    ---
+    Parameters:
+    - pattern : str, optional (default='[DAY.MONTH.YEAR, HOUR:MINUTE]')
+        Use the given pattern to print the date/time.
+        Use the keywords DAY, MONTH, YEAR, HOUR, MINUTE, SECOND where the date/time value should be placed.
+    - offset_days : int, optional (default=0)
+        Defines the day offset to the given current time.
+    - offset_hours : int, optional (default=0)
+        Defines the hour offset to the given current time.
+    - offset_minutes : int, optional (default=0)
+        Defines the minute offset to the given current time.
+    - offset_seconds : int, optional (default=0)
+        Defines the second offset to the given current time.
+    - timezone : Union(str, None), optional (default="Europe/Berlin")
+        Defines the timezone after pythons internal datetime lib. None for no timezone usage -> UTC + 0.
+    """
+    if time_zone and time_zone in available_timezones():
+        now = datetime.now(ZoneInfo("Europe/Berlin"))
+    else:
+        now = datetime.now()
+
+    now_with_offset = now + timedelta(days=offset_days, hours=offset_hours, minutes=offset_minutes, seconds=offset_seconds)
+    print_str = pattern.replace("DAY", f"{now_with_offset.day:02}")\
+                       .replace("MONTH", f"{now_with_offset.month:02}")\
+                       .replace("YEAR", f"{now_with_offset.year:04}")\
+                       .replace("HOUR", f"{now_with_offset.hour:02}")\
+                       .replace("MINUTE", f"{now_with_offset.minute:02}")\
+                       .replace("SECOND", f"{now_with_offset.second:02}")
+    return print_str
 
 def get_char():
     """
@@ -489,6 +617,51 @@ def rgb_to_python(r:int, g:int, b:int, background_color=False) -> str:
 #     XXX XXX XXX XXX XXX
 # XXX Non Print Functions XXX
 #     XXX XXX XXX XXX XXX
+def log(content:str, path="./logs", file_name="output.log", 
+        clear_log=False, add_backslash=True) -> None:
+    """
+    Saves your content into a log file.
+
+    ---
+    Parameters:
+    - content : str
+        Content which should get saved.
+    - path : str, optional(default="./logs")
+        Path where to save the log file.
+    - file_name : str, optional (default="output.log")
+        Name of the log file. With or without .log, both is ok.
+    - clear_log : bool, optional (default=False)
+        Whether to clear the logfile. You may want to set this to True on your first logging.
+    - add_backslash : bool, optional (default=True)
+        Decides if a backslash should be added to the end of your content.
+    """
+    # check/add log ending
+    if not file_name.endswith(".log"):
+        file_name += ".log"
+
+    # create folder
+    os.makedirs(path, exist_ok=True)
+    
+    path_to_file = os.path.join(path, file_name)
+    
+    # clear log/choose right mode
+    if clear_log:
+        mode = 'w'
+    else:
+        mode = 'a' if os.path.exists(path_to_file) else 'w'
+
+    # adding \n
+    if add_backslash:
+        content += "\n"
+
+    # logging/writing
+    try:
+        with open(path_to_file, mode) as f:
+            f.write(content)
+    except UnicodeEncodeError:
+        with open(path_to_file, mode, encoding="utf-8") as f:
+            f.write(content)
+
 def imshow(img, title=None, image_width=10, axis=False,
            color_space="RGB", cmap=None, cols=1, save_to=None,
            hspace=0.2, wspace=0.2,
@@ -629,7 +802,7 @@ def show_images(image_paths:list, title=None, image_width=5, axis=False,
                 color_space="gray", cmap=None, 
                 cols=2, save_to=None,
                 hspace=0.01, wspace=0.01,
-                use_original_sytle=False, invert=False) -> images:
+                use_original_sytle=False, invert=False):
     """
     Visulalizes/shows one or multiple images.
 
@@ -660,12 +833,229 @@ def show_images(image_paths:list, title=None, image_width=5, axis=False,
     - invert : bool, optional (default=False)
         Whether to invert the images or not.
     """
-    images = np.array([cv2.imread(img) for img in image_paths])
+    if color_space.lower() == "rgb":
+        images = np.array([cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB) for img in image_paths])
+    elif color_space.lower() == "hsv":
+        images = np.array([cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2HSV) for img in image_paths])
+    else:
+        images = np.array([cv2.imread(img) for img in image_paths])
     imshow(images, title=title, image_width=image_width, axis=axis,
            color_space=color_space, cmap=cmap, cols=cols, save_to=save_to,
            hspace=hspace, wspace=wspace,
            use_original_sytle=use_original_sytle, invert=invert)
     return images
+
+def build_func(func:str,
+                n=100,
+                xlim=[-10, 10]) -> list:
+    """
+    Builds a mathematical function from a string and evaluates it on a linear space.
+
+    ---
+    Parameters:
+    - func : str
+        A string representing the mathematical function. 
+        Use `x` as the variable (e.g., "sin(x)", "x^2 + 3*x - 5").
+        The caret (^) is automatically replaced with Python's power operator (**).
+        Colons (:) are replaced with division (/).
+    - n : int, optional (default=100)
+        Number of samples in the linspace for evaluating the function.
+    - xlim : list[float, float], optional (default=[-10, 10])
+        The range [start, end] over which the function is evaluated.
+
+    ---
+    Returns:
+    - (x_vals, y_vals) : Tuple[np.ndarray, np.ndarray]
+        A tuple of arrays: the x values and their corresponding evaluated y values.
+    """
+    func = func.replace("^", "**").replace(":", "/")
+
+    x = symbols('x')
+    expr = sympify(func)
+
+    # convert to numpy
+    f = lambdify(x, expr, modules=["numpy"])
+
+    # get values
+    x_vals = np.linspace(xlim[0], xlim[1], n)
+    y_vals = f(x_vals)
+
+    return (x_vals, y_vals)
+
+def plot_func(func,
+                should_plot=True,
+                should_print=False,
+                print_width=60,
+                should_print_information=True,
+                derivation_degree=3,
+                root_degree=1,
+                transparent=True,
+                color='white',
+                bg_color='white',
+                function_color="steelblue",
+                linestyle='-',
+                linewidth=2.0,
+                marker='None',
+                lim=10,
+                n=100,
+                x_size=15,
+                y_size=10,
+                grid=False,
+                xlim=None,
+                ylim=None,
+                coordinate=False,
+                small=False):
+    """
+    Plots a mathematical function from a string representation and optionally prints its derivatives and integrals.
+
+    ---
+    Parameters:
+    - func : str
+        A string representing the mathematical function. Use 'x' as the variable (e.g., "x^2", "sin(x)", etc.).
+    - should_plot : bool, optional (default=True)
+        Whether to display the plot using matplotlib.
+    - should_print : bool, optional (default=False)
+        Whether to print an ASCII representation of the plot.
+    - print_width : int, optional (default=60)
+        Width (in characters) of the printed ASCII plot.
+    - should_print_information : bool, optional (default=True)
+        Whether to print information about the function, its roots, and derivatives.
+    - derivation_degree : int, optional (default=3)
+        How many times the function should be differentiated.
+    - root_degree : int, optional (default=1)
+        How many times the function should be integrated.
+    - transparent : bool, optional (default=True)
+        Whether the ASCII plot background should be transparent.
+    - color : str, optional (default='white')
+        Color of plot edges and ticks.
+    - bg_color : str, optional (default='white')
+        Background color of the plot.
+    - function_color : str, optional (default="steelblue")
+        Color of the plotted function line.
+    - linestyle : str, optional (default='-')
+        Style of the function line (e.g., '-', '--', '-.', ':').
+    - linewidth : float, optional (default=2.0)
+        Width of the function line.
+    - marker : str, optional (default='None')
+        Marker for data points on the line. Use 'o', '.', etc., or 'None' for no markers.
+    - lim : int, optional (default=10)
+        Defines the default x-axis range as [-lim, lim] if `xlim` is not specified.
+    - n : int, optional (default=100)
+        Number of x values (samples) for the plot.
+    - x_size : float, optional (default=15)
+        Width of the figure in centimeters.
+    - y_size : float, optional (default=10)
+        Height of the figure in centimeters.
+    - grid : bool, optional (default=False)
+        Whether to show a grid in the plot.
+    - xlim : list of float, optional (default=None)
+        Custom x-axis limits; if None, calculated from `lim`.
+    - ylim : list of float, optional (default=None)
+        Custom y-axis limits; if None, automatically scaled based on y values.
+    - coordinate : bool, optional (default=False)
+        Whether to draw coordinate axes with zero-centered lines.
+    - small : bool, optional (default=False)
+        Whether to use a tighter layout for smaller figure spacing.
+    """
+    if not xlim:
+        xlim = [-lim, lim]
+    
+    # calc x and y values
+    result = build_func(func, n, xlim)
+   
+   # set matplotlib parameters + plot
+    if not ylim:
+        ylim = [result[1].min()-5, result[1].max()+5]
+    
+    with plt.rc_context({
+            'axes.edgecolor': color,
+            'xtick.color': color,
+            'ytick.color': color,
+            'figure.facecolor': bg_color,
+            'axes.facecolor': bg_color
+    }):
+        cm = 1 / 2.54  # centimeters in inches
+        plt.figure(figsize=((x_size * cm, y_size * cm)))
+        plt.plot(result[0],
+                    result[1],
+                    color=function_color,
+                    linestyle=linestyle,
+                    marker=marker,
+                    linewidth=linewidth)
+        plt.grid(grid)
+        plt.xlim(xlim)
+        plt.ylim(ylim)
+        if small:
+            plt.tight_layout()
+        if coordinate:
+            ax = plt.gca()
+            ax.spines['top'].set_color('none')
+            ax.spines['bottom'].set_position('zero')
+            ax.spines['left'].set_position('zero')
+            ax.spines['right'].set_color('none')
+
+        if should_print:
+            awesome_print(plt_to_str(transparent=transparent, width=print_width)+"\n")
+
+        # print informations
+        x = symbols('x')
+        f = func
+        txt = ""
+        txt += f"{BOLD}Function:{END}\nf(x) = {f}\n"
+        if root_degree > 0:
+            txt += BOLD+"    - Root Function:\n"+END
+        last_func = f
+        for i in range(root_degree):
+            last_func = integrate(last_func, x)
+            txt += f"      Degree {i+1}: F{'\''*(i+1)}(x) = {last_func}\n".replace("**", "^")
+        if derivation_degree > 0:
+            txt += BOLD+"\n    - Derivation:\n"+END
+        last_func = f
+        for i in range(derivation_degree):
+            last_func = diff(last_func, x)
+            txt += f"      Degree {i+1}: f{'\''*(i+1)}(x) = {last_func}\n".replace("**", "^")
+        
+        if should_print_information:
+            awesome_print(txt)
+
+        # plot
+        if should_plot:
+            plt.show()
+
+def plt_to_str(transparent=False, width=60) -> str:
+    """
+    Converts the current matplotlib plot to an ASCII string representation.
+
+    ---
+    Parameters:
+    - transparent : bool, optional (default=False)
+        Whether the saved image of the plot should have a transparent background.
+    - width : int, optional (default=60)
+        Width (in characters) of the ASCII representation.
+
+    ---
+    Returns:
+    - plot_img : str
+        The ASCII string representation of the current matplotlib plot.
+
+    ---
+    Notes:
+    - The function temporarily saves the current plot as a PNG image in the local directory (e.g., 'cache_plot_file00.png'),
+      converts it to ASCII using `img_to_str`, and deletes the image afterward.
+    - Make sure to plot some with matplotlib before.
+    """
+    idx = 0
+    cache_file = f"./cache_plot_file{idx:02}.png"
+    while os.path.exists(cache_file):
+        idx += 1
+        cache_file = f"./cache_plot_file{idx:02}.png"
+    plt.savefig(cache_file, transparent=transparent)
+
+    plot_img = img_to_str(img_path=cache_file, width=width)
+    
+    os.remove(cache_file)
+
+    return plot_img
 
 
 
@@ -683,10 +1073,11 @@ def color_print_example():
 
 def loading_example():
     for i in range(101):
-        print_progress_bar(total=100, progress=i, should_clear=False, left_bar_char="|", right_bar_char="|", 
-                            progress_char="#", empty_char=" ",
-                            front_message=f"YOLO Epoch: 1", back_message=f"Loss: {random.uniform(1.0, 0.1)}",
-                            size=12, should_print=True)
+        awesome_print(get_progress_bar(total=100, progress=i, should_clear=False, left_bar_char="|", right_bar_char="|", 
+                                        progress_char="#", empty_char=" ",
+                                        front_message=f"YOLO Epoch: 1", back_message=f"Loss: {random.uniform(1.0, 0.1)}",
+                                        size=12)
+                     )
         time.sleep(random.uniform(0.2, 0.07))
 
 def menu_example():
@@ -721,9 +1112,146 @@ def print_image_example():
 
     print_image(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logo.png"), width=50)
 
+def get_hardware_example():
+    awesome_print(get_hardware())
+
+def get_time_example():
+    awesome_print(get_time(pattern="[DAY.MONTH.YEAR, HOUR:MINUTE]",
+                            offset_days=0,
+                            offset_hours=0,
+                            offset_minutes=0,
+                            offset_seconds=0,
+                            time_zone="Europe/Berlin"))
+
+    awesome_print(get_time(pattern="[DAY.MONTH.YEAR, HOUR:MINUTE]",
+                            offset_days=0,
+                            offset_hours=2,
+                            offset_minutes=0,
+                            offset_seconds=0,
+                            time_zone="Europe/Berlin"))
+
+    awesome_print(get_time(pattern="[DAY.MONTH.YEAR, HOUR:MINUTE]",
+                            offset_days=0,
+                            offset_hours=-2,
+                            offset_minutes=0,
+                            offset_seconds=0,
+                            time_zone="Europe/Berlin"))
+
+    awesome_print(get_time(pattern="[DAY.MONTH.YEAR, HOUR:MINUTE]",
+                            offset_days=0,
+                            offset_hours=0,
+                            offset_minutes=0,
+                            offset_seconds=0,
+                            time_zone=None))
+
+    awesome_print(get_time(pattern="==> Current time: HOUR:MINUTE, Current date: DAY.MONTH.YEAR, <==",
+                            offset_days=0,
+                            offset_hours=0,
+                            offset_minutes=0,
+                            offset_seconds=0,
+                            time_zone=None))
+
+    awesome_print(get_time(pattern="Date in 1 year: DAY.MONTH.YEAR",
+                            offset_days=360,
+                            offset_hours=0,
+                            offset_minutes=0,
+                            offset_seconds=0,
+                            time_zone=None))
+
+def log_example():
+    log(f"Start Training, detecting hardware...\n{get_hardware()}", file_name=f"training_{get_time(pattern='YEAR_MONTH_DAY-HOUR_MINUTE')}")
+    # content = img_to_str(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logo.png"))
+    # log(content, file_name=f"my_awesome_log")
+
 def play_sound_example():
     play_sound(SOUNDS[2])
     time.sleep(1)
+
+def show_image_example():
+    image = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "logo.png")
+    show_images([image], title=None, image_width=5, axis=False,
+                color_space="gray", cmap=None, 
+                cols=1, save_to=None,
+                hspace=0.01, wspace=0.01,
+                use_original_sytle=False, invert=False)
+    show_images([image]*9, title=None, image_width=5, axis=False,
+                color_space="rgb", cmap=None, 
+                cols=3, save_to=None,
+                hspace=0.01, wspace=0.01,
+                use_original_sytle=False, invert=False)
+
+def plot_func_example():
+    plot_func("x^2",
+                should_plot=True,
+                should_print=False,
+                print_width=60,
+                should_print_information=True,
+                derivation_degree=3,
+                root_degree=1,
+                transparent=True,
+                color='white',
+                bg_color='white',
+                function_color="steelblue",
+                linestyle='-',
+                linewidth=2.0,
+                marker='None',
+                lim=10,
+                n=100,
+                x_size=15,
+                y_size=10,
+                grid=False,
+                xlim=None,
+                ylim=None,
+                coordinate=False,
+                small=False)
+
+    plot_func("x^2*x+10",
+                should_plot=False,
+                should_print=True,
+                print_width=60,
+                should_print_information=True,
+                derivation_degree=1,
+                root_degree=0,
+                transparent=True,
+                color='white',
+                bg_color='white',
+                function_color="steelblue",
+                linestyle='-',
+                linewidth=2.0,
+                marker='None',
+                lim=10,
+                n=100,
+                x_size=15,
+                y_size=10,
+                grid=False,
+                xlim=None,
+                ylim=None,
+                coordinate=False,
+                small=False)
+
+    plot_func("sin(x)",
+                should_plot=False,
+                should_print=True,
+                print_width=100,
+                should_print_information=False,
+                derivation_degree=3,
+                root_degree=1,
+                transparent=False,
+                color='white',
+                bg_color='black',
+                function_color="yellow",
+                linestyle='-',
+                linewidth=2.0,
+                marker='None',
+                lim=10,
+                n=1000,
+                x_size=15,
+                y_size=10,
+                grid=True,
+                xlim=None,
+                ylim=None,
+                coordinate=True,
+                small=False)
 
 
 
@@ -731,12 +1259,16 @@ def play_sound_example():
 
 
 if __name__ == "__main__":
-    print_example()
+    # print_example()
     # loading_example()
     # menu_example()
     # color_print_example()
     # input_confirm_example()
     # print_image_example()
+    # get_hardware_example()
+    # get_time_example()
+    log_example()
     # play_sound_example()
-
+    # show_image_example()
+    # plot_func_example()
 

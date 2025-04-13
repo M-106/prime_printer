@@ -47,7 +47,9 @@ pip install prime_printer
     - [awesome_print](#awesome_print)
     - [add_special_effect](#add_special_effect)
     - [img_to_str](#img_to_str)
-    - [print_progress_bar](#print_progress_bar)
+    - [get_progress_bar](#get_progress_bar)
+    - [get_hardware](#get_hardware)
+    - [get_time](#get_time)
     - [clear](#clear)
     - [get_input](#get_input)
     - [get_char](#get_char)
@@ -55,6 +57,8 @@ pip install prime_printer
     - [play_sound](#play_sound)
 - [Functions not for print](#functions-not-for-print)
    - [show_images](#show_images)
+   - [plot_func](#plot_func)
+
 
 
 > There are also some examples on the bottom of the [core file](./prime_printer/cio_helper.py).
@@ -68,6 +72,10 @@ pip install prime_printer
 
 ---
 ### Constants
+
+---
+
+
 
 All constants are available with:
 ```python
@@ -118,6 +126,7 @@ my_awesome_txt = prime.BOLD + "AWESOME" + prime.END
 ---
 ### Functions
 
+---
 
 
 
@@ -259,9 +268,9 @@ prime.print_image("logo.png", width=80)
 
 
 ---
-#### print_progress_bar
+#### get_progress_bar
  
-`print_progress_bar(total, progress, should_clear=False, left_bar_char="|", right_bar_char="|", progress_char="#", empty_char=" ", size=100, should_print=True) -> str`
+`get_progress_bar(total, progress, should_clear=False, left_bar_char="|", right_bar_char="|", progress_char="#", empty_char=" ", size=100) -> str`
 
 Displays a customizable progress bar in the console, ideal for visual feedback in loops, tasks, or animations.
 
@@ -269,7 +278,7 @@ Displays a customizable progress bar in the console, ideal for visual feedback i
 import prime_printer as prime
 
 for i in range(101):
-    prime.print_progress_bar(total=100, progress=i)
+    prime.awesome_print(prime.get_progress_bar(total=100, progress=i))
     time.sleep(0.05)
 ```
 
@@ -287,12 +296,60 @@ for i in range(101):
 | `front_message`   | `str`           | `""`        | Message for the progress bar.                                            |
 | `back_message`    | `str`           | `""`        | Message behind the progress bar.                                         |
 | `size`            | `int`           | `100`       | Total width of the progress bar in characters.                           |
-| `should_print`    | `bool`          | `True`      | If `True`, prints the bar. If `False`, returns the string only.          |
 
 ---\> Returns <---
 - `str`: The generated progress bar string (printed if `should_print=True`).
 
 
+
+<br><br>
+
+
+---
+#### get_hardware
+
+`get_hardware() -> None`
+
+Prints the current detected hardware and ai support. Prints information about: System, CPU, GPU and RAM.
+
+```python
+import prime_printer as prime
+
+prime.awesome_print(prime.get_hardware())
+```
+
+<br><br>
+
+---
+#### get_time
+
+`get_time(pattern="[DAY.MONTH.YEAR, HOUR:MINUTE]", offset_days=0, offset_hours=0, offset_minutes=0, offset_seconds=0, time_zone="Europe/Berlin")`
+
+This function prints the current date and time based on a custom pattern and optional time offsets. It supports timezone handling and allows backspace characters at the end of the printed string, useful for updating dynamic terminal output.
+
+```python
+import prime_printer as prime
+
+# Print the current time in the format '[DAY.MONTH.YEAR, HOUR:MINUTE]'
+prime.awesome_print(prime.get_time())
+
+# Print time 1 hour and 30 minutes in the future with a different format
+prime.awesome_print(prime.get_time(pattern="[HOUR:MINUTE:SECOND on DAY/MONTH/YEAR]", offset_hours=1, offset_minutes=30))
+```
+
+In this example, the function prints the current or adjusted time formatted with your custom pattern.
+
+
+---\> Parameters <---
+
+| **Parameter**                | **Type**  | **Description**                                                                 |
+|-----------------------------|-----------|---------------------------------------------------------------------------------|
+| `pattern`                   | `str`     | A custom pattern using keywords like `DAY`, `MONTH`, `YEAR`, `HOUR`, `MINUTE`, and `SECOND`. |
+| `offset_days`               | `int`     | Days to offset from the current time.                                          |
+| `offset_hours`              | `int`     | Hours to offset from the current time.                                         |
+| `offset_minutes`            | `int`     | Minutes to offset from the current time.                                       |
+| `offset_seconds`            | `int`     | Seconds to offset from the current time.                                       |
+| `time_zone`                 | `str`     | The IANA timezone name (e.g., `"Europe/Berlin"`). Set to `None` for UTC+0.     |
 
 <br><br>
 
@@ -473,6 +530,49 @@ In this example, the function will load and play the `typing_sound.wav` file loc
 ---
 ### Functions not for print
 
+---
+
+
+
+#### log
+
+`log(content: str, path="./logs", file_name="output.log", clear_log=False, add_backslash=True)`
+
+This function saves a given string of content into a `.log` file at a specified location. It can either append to the file or clear its contents first, depending on your use case. It is helpful for storing debug outputs, notes, or any kind of logging information during runtime.
+
+```python
+import prime_printer as prime
+
+# Save a message into the default log file
+prime.log("Process started...")
+
+# Save to a custom location and clear the log first
+prime.log("First line of a fresh log", path="my_logs", file_name="run.log", clear_log=True)
+
+# Append more content to the same file
+prime.log("Another log entry.", path="my_logs", file_name="run.log")
+
+# Use other prime functions in combination
+prime.log(f"Start Training, detecting hardware...\n{prime.get_hardware()}", 
+          file_name=f"training_{prime.get_time(pattern='YEAR_MONTH_DAY-HOUR_MINUTE')}")
+```
+
+In this example, the `log()` function helps you manage logs in a clean and customizable way.
+
+---
+
+> Parameters <---
+
+| **Parameter**    | **Type** | **Description**                                                                 |
+|------------------|----------|---------------------------------------------------------------------------------|
+| `content`        | `str`    | The text content to be saved to the log file.                                  |
+| `path`           | `str`    | Directory where the log file will be stored. Defaults to `"./logs"`.           |
+| `file_name`      | `str`    | Name of the log file (with or without `.log` extension). Defaults to `"output.log"`. |
+| `clear_log`      | `bool`   | If `True`, clears the file before writing. If `False`, appends to existing log. |
+| `add_backslash`  | `bool`   | If `True`, add a backslash at the end of the given content string.             |
+
+
+<br><br>
 
 ---
 #### show_images
@@ -516,6 +616,64 @@ In this example, two images will be loaded, converted to RGB color space, and di
 | **Return** | **Type**        | **Description**                      |
 |------------|------------------|--------------------------------------|
 | `images`   | `np.ndarray`     | Array of the loaded images.          |
+
+
+
+<br><br>
+
+---
+#### plot_func
+
+`plot_func(func, should_plot=True, should_print=False, print_width=60, should_print_information=True, derivation_degree=3, root_degree=1, transparent=True, color='white', bg_color='white', function_color="steelblue", linestyle='-', linewidth=2.0, marker='None', lim=10, n=100, x_size=15, y_size=10, grid=False, xlim=None, ylim=None, coordinate=False, small=False)`
+
+This function plots a mathematical expression given as a string. It supports symbolic differentiation and integration (via SymPy), optional display of results in ASCII format, and customizable styling for the matplotlib plot.
+
+```python
+import prime_printer as prime
+
+# Plot and print information about a function
+prime.plot_func("sin(x) + x^2")
+
+# Show only ASCII output, without rendering the plot
+prime.plot_func("x^3 - 3*x", should_plot=False, should_print=True)
+
+# Customize the appearance and derivative depth
+prime.plot_func("cos(x)", derivation_degree=2, root_degree=1, function_color="red", linestyle='--')
+```
+
+In this example, the function string is parsed and evaluated over a defined range. Derivatives and integrals are shown based on the user’s input. The plot can be shown as an image or ASCII.
+
+--\> Parameters <---
+
+| **Parameter**             | **Type**     | **Description**                                                                 |
+|--------------------------|--------------|---------------------------------------------------------------------------------|
+| `func`                   | `str`        | A string representing the function to plot (e.g., `"x^2 + sin(x)"`). Use `'x'` as variable. |
+| `should_plot`            | `bool`       | Whether to display the plot in a window (via `matplotlib`).                    |
+| `should_print`           | `bool`       | Whether to print an ASCII representation of the plot.                          |
+| `print_width`            | `int`        | Width (in characters) for ASCII plot output.                                   |
+| `should_print_information` | `bool`     | Whether to print symbolic function info, roots and derivatives.                |
+| `derivation_degree`      | `int`        | Number of times the function is symbolically differentiated.                   |
+| `root_degree`            | `int`        | Number of times the function is symbolically integrated.                       |
+| `transparent`            | `bool`       | Whether the background of the ASCII plot should be transparent.                |
+| `color`                  | `str`        | Color for plot edges and tick marks.                                           |
+| `bg_color`               | `str`        | Background color of the plot.                                                  |
+| `function_color`         | `str`        | Line color for the function plot.                                              |
+| `linestyle`              | `str`        | Style of the function line (`'-'`, `'--'`, `':'`, etc.).                       |
+| `linewidth`              | `float`      | Thickness of the plotted line.                                                 |
+| `marker`                 | `str`        | Marker for plotted points (`'o'`, `'.'`, etc., or `'None'` to disable).        |
+| `lim`                    | `int`        | Symmetric range for x-axis (from `-lim` to `+lim`), if `xlim` is not set.      |
+| `n`                      | `int`        | Number of points to sample for plotting.                                       |
+| `x_size`                 | `float`      | Width of the figure in centimeters.                                            |
+| `y_size`                 | `float`      | Height of the figure in centimeters.                                           |
+| `grid`                   | `bool`       | Whether to show grid lines in the plot.                                        |
+| `xlim`                   | `list[float]`| Manual x-axis limits; overrides `lim` if set.                                  |
+| `ylim`                   | `list[float]`| Manual y-axis limits; if `None`, auto-scaled based on y values.                |
+| `coordinate`             | `bool`       | Whether to draw zero-centered x and y axes (origin-based coordinate system).   |
+| `small`                  | `bool`       | Use tight layout to reduce padding and spacing in the plot.                    |
+
+
+---
+
 
 
 
