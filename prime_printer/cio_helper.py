@@ -26,6 +26,7 @@ import climage
 # audio
 #     redirect standard output to suppress pygames print message
 AUDIO_INITIALIZED = False
+original_stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 try:
     import pygame
@@ -35,7 +36,8 @@ try:
 except Exception:
     AUDIO_INITIALIZED = False
 # Restore standard output
-sys.stdout = sys.__stdout__
+sys.stdout.close()
+sys.stdout = original_stdout
 
 # console input
 if platform.system() == "Linux":
@@ -1261,7 +1263,7 @@ def plot_func_example():
 
 
 if __name__ == "__main__":
-    # print_example()
+    print_example()
     # loading_example()
     # menu_example()
     # color_print_example()
