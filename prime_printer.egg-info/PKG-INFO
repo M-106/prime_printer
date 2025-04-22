@@ -1,9 +1,9 @@
 Metadata-Version: 2.4
 Name: prime_printer
-Version: 0.1.1
+Version: 0.1.2
 Summary: Console I/O Helper - Print Awesome. Make It Prime.
 Home-page: https://github.com/xXAI-botXx/prime_printer
-Download-URL: https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_06.zip
+Download-URL: https://github.com/xXAI-botXx/prime_printer/archive/refs/tags/v_07.zip
 Author: Tobia Ippolito
 License: MIT
 Keywords: Printing,Helper
@@ -11,6 +11,7 @@ Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers
 Classifier: Topic :: Software Development :: Build Tools
 Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10

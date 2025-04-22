@@ -1007,13 +1007,15 @@ def plot_func(func,
         last_func = f
         for i in range(root_degree):
             last_func = integrate(last_func, x)
-            txt += f"      Degree {i+1}: F{'\''*(i+1)}(x) = {last_func}\n".replace("**", "^")
+            apostrophs = "'" * (i+1)
+            txt += f"      Degree {i+1}: F{apostrophs}(x) = {last_func}\n".replace("**", "^")
         if derivation_degree > 0:
             txt += BOLD+"\n    - Derivation:\n"+END
         last_func = f
         for i in range(derivation_degree):
             last_func = diff(last_func, x)
-            txt += f"      Degree {i+1}: f{'\''*(i+1)}(x) = {last_func}\n".replace("**", "^")
+            apostrophs = "'" * (i+1)
+            txt += f"      Degree {i+1}: f{apostrophs}(x) = {last_func}\n".replace("**", "^")
         
         if should_print_information:
             awesome_print(txt)
@@ -1267,8 +1269,8 @@ if __name__ == "__main__":
     # print_image_example()
     # get_hardware_example()
     # get_time_example()
-    log_example()
+    # log_example()
     # play_sound_example()
     # show_image_example()
-    # plot_func_example()
+    plot_func_example()
 
