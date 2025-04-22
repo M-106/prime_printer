@@ -1,0 +1,32 @@
+Start Training, detecting hardware...
+
+-------------------------------- 
+Your Hardware:
+
+    ---> General <---
+Operatingsystem: Windows
+Version: 10.0.26100
+Architecture: ('64bit', 'WindowsPE')
+Processor: AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD
+
+    ---> GPU <---
+GPU Name: NVIDIA GeForce RTX 4060
+VRAM Total: 8188 MB
+VRAM Used: 2471 MB
+Utilization: 0.0 %
+PyTorch Support: False -> not installed
+TensorFlow Support: False -> not installed
+
+    ---> CPU <---
+CPU-Name: AMD Ryzen 7 3700X 8-Core Processor
+CPU Kernels: 8
+Logical CPU-Kernels: 16
+CPU-Frequence: 3600 MHz
+CPU-Utilization: 5.7 %
+
+    ---> RAM <---
+RAM Total: 31 GB
+RAM Available: 16 GB
+RAM-Utilization: 48.6 %
+
+--------------------------------

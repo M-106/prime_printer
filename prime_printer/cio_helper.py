@@ -453,7 +453,7 @@ def get_hardware() -> str:
     # CPU-Information
     harware_info += f"\n\n    ---> CPU <---"
     cpu_info = get_cpu_info()
-    harware_info += f"\nCPU-Name: {cpu_info["brand_raw"]}"
+    harware_info += f"\nCPU-Name: {cpu_info['brand_raw']}"
     harware_info += f"\nCPU Kernels: {psutil.cpu_count(logical=False)}"
     harware_info += f"\nLogical CPU-Kernels: {psutil.cpu_count(logical=True)}"
     harware_info += f"\nCPU-Frequence: {int(psutil.cpu_freq().max)} MHz"
