@@ -360,7 +360,7 @@ def print_image(img_path, width=60, is_256color=False, is_truecolor=True, is_uni
 def get_progress_bar(total, progress, should_clear=False, 
                        left_bar_char="|", right_bar_char="|", progress_char="#", empty_char=" ",
                        front_message="", back_message="",
-                       size=100) -> str:
+                       size=100, directly_print=True) -> str:
     """
     Prints one step of a progress as a progress bar.
 
@@ -386,7 +386,7 @@ def get_progress_bar(total, progress, should_clear=False,
         Message behind the progress bar.
     - size : int, optional (default=100)
         Amount of signs of the progress bar.
-    - should_print : bool, optional (default=True)
+    - directly_print : bool, optional (default=True)
         Whether to print the progress bar.
 
     ---
@@ -395,14 +395,20 @@ def get_progress_bar(total, progress, should_clear=False,
         Created progress bar.
     """
     # clearing
-    if should_clear:
-        clear()
+    # if should_clear:
+    #     clear()
     
     # calc progress bar
     percentage = progress/float(total)
     percentage_adjusted = int( size * percentage )
     bar = progress_char*percentage_adjusted + empty_char*(size-percentage_adjusted)
     progress_str = f"{front_message} {left_bar_char}{bar}{right_bar_char} {percentage*100:0.2f}% {back_message}".strip()
+
+    if should_clear:
+        progress_str = "\r" + progress_str 
+
+    if directly_print:
+        print(progress_str, end="", flush=True)
 
     return progress_str
 
@@ -1080,7 +1086,15 @@ def loading_example():
         awesome_print(get_progress_bar(total=100, progress=i, should_clear=False, left_bar_char="|", right_bar_char="|", 
                                         progress_char="#", empty_char=" ",
                                         front_message=f"YOLO Epoch: 1", back_message=f"Loss: {random.uniform(1.0, 0.1)}",
-                                        size=12)
+                                        size=12, directly_print=False)
+                     )
+        time.sleep(random.uniform(0.2, 0.07))
+    print("\nNow in one line:\n")
+    for i in range(101):
+        get_progress_bar(total=100, progress=i, should_clear=True, left_bar_char="|", right_bar_char="|", 
+                                        progress_char="#", empty_char=" ",
+                                        front_message=f"YOLO Epoch: 1", back_message=f"Loss: {random.uniform(1.0, 0.1)}",
+                                        size=12, directly_print=True
                      )
         time.sleep(random.uniform(0.2, 0.07))
 
@@ -1263,8 +1277,8 @@ def plot_func_example():
 
 
 if __name__ == "__main__":
-    print_example()
-    # loading_example()
+    #print_example()
+    loading_example()
     # menu_example()
     # color_print_example()
     # input_confirm_example()
@@ -1274,5 +1288,5 @@ if __name__ == "__main__":
     # log_example()
     # play_sound_example()
     # show_image_example()
-    plot_func_example()
+    # plot_func_example()
 

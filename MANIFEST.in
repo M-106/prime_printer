@@ -1,3 +1,4 @@
 include prime_printer/sounds/*
 include logo.png
 include res/*
+include LICENSE
